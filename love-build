@@ -1,0 +1,25 @@
+# Zip the files to create .love
+zip $1.zip *
+mv $1.zip $1.love
+
+# Create a build folder and the folders for the distributions
+mkdir build
+mkdir build/win
+mkdir build/linux
+
+# Copy required files [Windows Case]
+cp ~/Scripts/love64/SDL2.dll ./build/win
+cp ~/Scripts/love64/OpenAL32.dll ./build/win
+cp ~/Scripts/love64/license.txt ./build/win
+cp ~/Scripts/love64/love.dll ./build/win
+cp ~/Scripts/love64/lua51.dll ./build/win
+cp ~/Scripts/love64/mpg123.dll ./build/win
+cp ~/Scripts/love64/msvcp120.dll ./build/win
+cp ~/Scripts/love64/msvcr120.dll ./build/win
+
+# Build windows exec
+cat ~/Scripts/love64/love.exe $1.love > ./build/win/$1.exe
+
+# Build linux exec
+cat /usr/bin/love $1.love > ./build/linux/$1
+chmod a+x ./build/linux/$1
