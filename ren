@@ -2,25 +2,121 @@
 
 # Imports
 import os
+import glob
+import re
+import sys
+import time
+import shutil
 
 # Script Body
 
-## Variables
+# Variables
 
-path = os.getcwd()
-common_name = input("Insert a common name: ")
-extension = input("Insert the extension of the files: ")
+os.system('clear')
+path = os.getcwd()  # Get the path
+os.chdir('..')
+destine = os.getcwd()
+os.chdir(path)
+changePath = False
+
+pArtist = "Insert the artist name.\n"
+for character in pArtist:
+    sys.stdout.write(character)
+    sys.stdout.flush()
+    time.sleep(0.02)
+artist = input("► ")
+
+pCommonName = "\nInsert the album name.\n"
+for character in pCommonName:
+    sys.stdout.write(character)
+    sys.stdout.flush()
+    time.sleep(0.02)
+common_name = input("► ")  # Name for the files provided by user
+
+if '-a' in sys.argv and '-m' in sys.argv:
+    pCExtraName = "\nInsert the extra name.\n"
+    for character in pCExtraName:
+        sys.stdout.write(character)
+        sys.stdout.flush()
+        time.sleep(0.02)
+    cExtraName = input("► ")
+    changePath = True
+
+elif '-a' in sys.argv:
+    pCExtraName = "\nInsert the extra name.\n"
+    for character in pCExtraName:
+        sys.stdout.write(character)
+        sys.stdout.flush()
+        time.sleep(0.02)
+    cExtraName = input("► ")
+    changePath = False
+
+elif '-m' in sys.argv:
+    cExtraName = None
+    changePath = True
+
+else:
+    cExtraName = None
+    changePath = False
+
+pExtension = "\nInsert the extension of the files.\n"
+for character in pExtension:
+    sys.stdout.write(character)
+    sys.stdout.flush()
+    time.sleep(0.02)
+extension = input("► ")  # Extension for the file
+print('')
+numbers = re.compile(r'(\d+)')  # Regex to get the index of the file?
+count = 0
 
 # What the script does
 
+
+def numericalSort(value):  # Some function that i take from StackOverflow
+    parts = numbers.split(value)
+    parts[1::2] = map(int, parts[1::2])
+    return parts
+
+
+print("\nBeginning Renamer\n")
+
 for i, f in enumerate(os.listdir(path)):
-	index = '000'
-	if i < 10:
-		index = '00{}'.format(i)
-	elif i >= 10 and i < 100:
-		index = '0{}'.format(i)
-	else:
-		index = i
-	f_new = '{0}-{1}.{2}'.format(common_name, index, extension)
-	os.rename(f, f_new)
-	print('{0}. {1} -> {2}'.format(i, f, f_new))
+    count += 1
+
+# For each file from the folder in the path
+for i, f in enumerate(sorted(os.listdir(path), key=numericalSort)):
+    index = '000'
+    if i < 10:
+        index = '00{}'.format(i)
+    elif i >= 10 and i < 100:
+        index = '0{}'.format(i)
+    else:
+        index = i
+
+    if cExtraName in ('', None):
+        # New name of the file
+        f_new = '[{0}]{1}-{2}.{3}'.format(artist,
+                                          common_name, index, extension)
+    else:
+        f_new = '[{0}]{1}({2})-{3}.{4}'.format(artist,
+                                               common_name, cExtraName, index, extension)
+
+    os.rename(f, f_new)  # Rename the file to the new name
+
+    if changePath:
+        shutil.move('{0}/{1}'.format(path, f_new),
+                    '{0}/{1}'.format(destine, f_new))
+
+    showOutput = '{0}|{1} \n    WAS ► {2} \n        IN FOLDER ► {3} \n\n    NOW IS ► {4} \n        IN FOLDER ► {5} \n\n'.format(
+        i+1, count, f, path, f_new, destine)
+
+    for character in showOutput:
+        sys.stdout.write(character)
+        sys.stdout.flush()
+        time.sleep(0.01)  # Print the result in a beauty way
+
+
+print("{0} Finished {0}".format('#'*10))
+
+time.sleep(1)
+os.system('exit')
